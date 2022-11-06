@@ -1,27 +1,61 @@
-EXAMPLE
-=============
 
-Compatible with PHP >= 7.0.
+# Rndoom04\Comgate
 
-This is a library-template for writing custom PHP library functions
+Comgate is payment gateway from the Czech republic. https://www.comgate.cz/
 
-## Install
+## Installation
 
-For PHP version **`>= 7.0`**:
+Install Rndoom04\comgate with composer
 
+```bash
+  composer require Rndoom04\comgate
 ```
-composer require Rndoom04/example
-```
+## Usage/Examples
 
-## How to use it
+First - init the library.
+```php
+use Rndoom04\comgate\comgate;
 
-Firstly init the library by simply "use".
-
-```
-use Rndoom04\example;
+$comgate = new comgate();
 ```
 
-Then set load the library and set it how you want.
+Set the merchant and secret
+```php
+$comgate->setMerchant('mergantID', '*************');
 ```
-$spamdetector = new \Rndoom04\example\example();
+
+Create payment
+```php
+// Prepare data
+$paymentData = (object)[
+  "price" => 10000, // 100.00 CZK should be 10000 (×100)
+  "curr" => "CZK", // Currency
+  "label" => "Product name", // Short desc. name
+  "refId" => "123456789", // Variable symbol
+  "method" => "ALL", // Method for payment
+  "test" => true, // false
+  "prepareOnly" => false // !important
+];
+
+// Create payment, obtain transId and redirect URL
+$pay = $comgate->createPayment($data->price, $data->curr, $data->label, $data->refId, $data->method, $data->test, $data->prepareOnly);
+
+// Process
+if ($pay['code'] == 0) {
+  // OK, save $pay['transId'] for futher use
+  // var_dump($pay);
+  // Redirect
+  Header("Location: ".$pay['redirect']);
+  die();
+} else {
+  // Something went wrong
+  // ... do some magic
+}
+```
+
+Get payment info
+```php
+// Get payment info
+$info = $comgate->getPaymentInfo("some-payment-id");
+var_dump($info);
 ```

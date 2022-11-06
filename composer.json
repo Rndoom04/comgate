@@ -12,7 +12,9 @@
             "php": ">=7.4"
     },
     "autoload": {
-        "files": [ "src/comgate.php" ]
+        "files": [
+            "src/comgate.php"
+        ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true

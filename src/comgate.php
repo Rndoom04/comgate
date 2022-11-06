@@ -5,9 +5,9 @@
      * release date: 2.6.2022
      */
 
-    namespace Rndoom04\example;
+    namespace Rndoom04\comgate;
 
-    class example {
+    class comgate {
         // Example variable
         private $example = null;
         

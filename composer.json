@@ -1,18 +1,18 @@
 {
-    "name": "rndoom04/example",
+    "name": "rndoom04/comgate",
     "description": "A example-template library for PHP.",
     "license": "MIT",
     "authors": [
         {
-            "name": "Slavomí­r Kollert",
+            "name": "Slavomir Kollert",
             "email": "info@kollertslavomir.cz"
         }
     ],
     "require": {
-            "php": ">=7.0"
+            "php": ">=7.4"
     },
     "autoload": {
-        "files": [ "src/example.php" ]
+        "files": [ "src/comgate.php" ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true

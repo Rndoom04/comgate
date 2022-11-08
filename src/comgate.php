@@ -1,18 +1,13 @@
 <?php
     /*
-     * Comgate payment gateway https://www.comgate.cz/
+     * Example library for PHP by Kollert Slavomír
      * version: 1.0
      * release date: 6.11.2022
-     * Author: Kollert Slavomír
      */
 
     namespace Rndoom04\comgate;
 
-    use GuzzleHttp\Client;
-    use GuzzleHttp\RequestOptions;
-
     class comgate {
-        /** Properties **/
         // Test mode - default false
         private $test_mode = false;
 
@@ -34,14 +29,21 @@
         // Merchant data
         private $merchant;
         private $secret;
-        
-        
-        
-        /** Methods **/
+
+
+        /** Construct **/
         public function __construct() {}
-        
 
 
+        /** Parse data from response **/
+        private function parseData(string $data) {
+            parse_str($data, $result);
+
+            return $result;
+        }
+
+
+        /** Merchant data */
         // Set merchant
         public function setMerchant(string $merchant, string $secret) {
             if (!empty($merchant) && !empty($secret)) {
@@ -55,14 +57,13 @@
             // Something went wrong
             return false;
         }
-        
         // Is merchant ok?
         public function checkMerchant() {
             return (!empty($this->merchant) && !empty($this->secret))?true:false;
         }
-        
 
 
+        /** Methods **/
         // Get payment information
         public function getPaymentInfo(string $transID) {
             if ($this->checkMerchant()) {
@@ -87,7 +88,7 @@
                     $body = (string)$response->getBody();
                     return $this->parseData($body);
                 } catch (Exception $e) {
-                    $this->addError("Exception: ".$e);
+                    $this->addError("Request for getting payment info ends with errors. Probably bad data format.");
                     return false;
                 }
             } else {
@@ -115,10 +116,9 @@
                     $response = $client->request('POST', $this->endpoints['payment_methods'], [
                         'form_params' => $data
                     ]);
-                    
                     $body = (string)$response->getBody(); // Returns XML
 
-                    // Convert xml to array through json
+                    // Convert xml to array
                     $xml = simplexml_load_string($body, "SimpleXMLElement", LIBXML_NOCDATA);
                     $arr = json_decode(json_encode($xml), true);
                     if (isset($arr['method'])) {
@@ -127,7 +127,7 @@
 
                     return null;
                 } catch (Exception $e) {
-                    $this->addError("Exception: ".$e);
+                    $this->addError("Request for getting payment methods ends with errors. Probably bad data format.");
                     return false;
                 }
             } else {
@@ -156,13 +156,12 @@
                     $response = $client->request('POST', $this->endpoints['storno'], [
                         'form_params' => $data
                     ]);
-                    $body = (string)$response->getBody();
-                    
-                    return $this->parseData($body);
                 } catch (Exception $e) {
-                    $this->addError("Exception: ".$e);
+                    $this->addError("Request for storno/cancel payment ends with errors. Probably bad data format.");
                     return false;
                 }
+                $body = (string)$response->getBody();
+                return $this->parseData($body);
             } else {
                 $this->addError("Merchant data is not available. First of all use setMerchant() method.");
             }
@@ -193,13 +192,12 @@
                     $response = $client->request('POST', $this->endpoints['refund'], [
                         'form_params' => $data
                     ]);
-                    $body = (string)$response->getBody();
-                    
-                    return $this->parseData($body);
                 } catch (Exception $e) {
-                    $this->addError("Exception: ".$e);
+                    $this->addError("Request for refund payment ends with errors. Probably bad data format.");
                     return false;
                 }
+                $body = (string)$response->getBody();
+                return $this->parseData($body);
             } else {
                 $this->addError("Merchant data is not available. First of all use setMerchant() method.");
             }
@@ -249,7 +247,6 @@
                     ];
                     $request = new \GuzzleHttp\Psr7\Request('POST', $this->endpoints['create_payment'], $headers);
                     $res = $client->sendAsync($request, $options)->wait();
-                    
                     return $this->parseData($res->getBody()->getContents());
                 } catch (Exception $e) {
                     $this->addError("Request for create payment ends with errors. Probably bad data format.");
@@ -259,9 +256,10 @@
                 $this->addError("Merchant data is not available. First of all use setMerchant() method.");
             }
         }
-        
 
 
+
+        /** Errors **/
         // Add error
         private function addError(string $error) {
             $this->errors[] = $error;
@@ -274,9 +272,8 @@
         public function getErrors() {
             return $this->errors;
         }
-        
 
-
+        /** Test mode */
         // Enable/disable test mode
         public function setTestMode(bool $mode) {
             $this->test_mode = $mode;
@@ -284,16 +281,6 @@
         // Get test mode
         public function getTestMode() {
             return $this->test_mode; // returns bool
-        }
-        
-
-
-        // Parse data from response
-        private function parseData(string $data) {
-            $result = null;
-            parse_str($data, $result);
-
-            return $result;
         }
     }
 ?>

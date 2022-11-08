@@ -1,4 +1,3 @@
-
 # Rndoom04\Comgate
 
 Comgate is payment gateway from the Czech republic. https://www.comgate.cz/
